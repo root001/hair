@@ -113,7 +113,7 @@
             //    echo 'checkpoint 3 <br>';var_dump($logo_info); die;
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
-                    ? $check ="send data to db"
+                    ? 
                  /*   $this->user->add(set_value('username'), set_value('first_name'), set_value('last_name'), set_value('email'), 
                     set_value('profession'), set_value('mobile_1'), set_value('mobile_2'), set_value(password_hash('password', PASSWORD_BCRYPT)), 
                     $logo_info['logo_url'], set_value('street'), set_value('city'), set_value('state'), set_value('country')) */

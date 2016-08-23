@@ -1,0 +1,343 @@
+<html>
+	<head>
+		<title>
+			Hairluks stylist user registeration Page
+		</title>
+		<!-- CSS -->
+        <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../../bootstrap/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../../font-awesome/css/font-awesome-animation.min.css">
+        <link rel="stylesheet" href="../../css/main.css">
+
+        <!-- JS -->
+        <script src="../../js/jquery.min.js"></script>
+        <script src="../../bootstrap/js/bootstrap.min.js"></script>
+        <script src="../../js/main.js"></script>
+		<script src="../../js/stylist.js"></script>
+		<script src="../../js/verify.notify.min.js"></script>
+		
+	</head>
+	
+	<body>
+	
+	<nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="">Logo</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-left visible-xs">
+                        <li >
+                            <a href="">
+                                <i class="fa fa-home"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fa fa-users"></i>
+                                Users
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <i class="fa fa-users"></i>
+                                Sytlist
+                            </a>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+	
+		<div class="row hidden-print">
+			<div class="col-sm-12">
+				<div class="pwell">
+					<!-- Header (add new stylist, sort order etc.) -->
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="col-sm-2 fa fa-user-plus pointer" style="color:#337ab7" data-target='#addNewStylistModal' data-toggle='modal'>
+								New stylist
+							</div>
+							<div class="col-sm-3 form-inline form-group-sm">
+								<label for="userListPerPage">Show</label>
+								<select id="userListPerPage" class="form-control">
+									<option value="1">1</option>
+									<option value="5">5</option>
+									<option value="10" selected>10</option>
+									<option value="15">15</option>
+									<option value="20">20</option>
+									<option value="30">30</option>
+									<option value="50">50</option>
+									<option value="100">100</option>
+								</select>
+								<label for="userListPerPage">per page</label>
+							</div>
+							<div class="col-sm-4 form-inline form-group-sm">
+								Sort by 
+								<select id="userListSortBy" class="form-control">
+									<option value="username-ASC" selected>Username (A to Z)</option>
+									<option value="username-DESC">Username (Z to A)</option>
+								</select>
+							</div>
+							<div class="col-sm-3 form-inline form-group-sm">
+								<label for="userSearch"><i class="fa fa-search"></i></label>
+								<input type="search" id="custSearch" placeholder="Search Stylist" class="form-control">
+							</div>
+						</div>
+					</div>
+					
+					<hr>
+					<!-- Header (sort order etc.) ends -->
+					
+					<!-- User info -->
+					<div class="row" id="allStylistDiv">
+						<div class="col-sm-12">
+							<!-- User's list -->
+							<div class="col-sm-12" id="allStylist"></div>
+							 <!-- User's list end -->
+							
+							<!-- User details -->
+							<div class="col-sm-4" id="StylistInfo"></div>
+							 <!-- User details end -->
+						</div>
+					</div>
+					<!-- stylist list ends -->
+				</div>
+			</div>
+		</div>
+
+
+		<!--- Modal to add new stylist --->
+		<div class='modal fade' id='addNewStylistModal' role="dialog" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class='modal-header'>
+						<button class="close" data-dismiss='modal'>&times;</button>
+						<h4 class="text-center">Add New Stylist</h4>
+						<div class="text-center">
+							<i id="fMsgIcon"></i>
+							<span id="fMsg"></span>
+						</div>
+					</div>
+					<div class="modal-body">
+						<form id='addNewStylistForm' name='addNewStylistForm' role='form'>
+						
+							<div class="row">
+								<div class="col-sm-12">
+									<center><img src="" id='picture' class="img-responsive" width="600px" height="400px"></center>
+									<br>
+									<label>Change Image(max file size; 500kb):</label>
+									<input type="file" id="picture" class="form-control">
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='username' class="control-label">Username</label>
+									<input type="text" id='username' class="form-control checkField" placeholder="Username">
+									<span class="help-block errMsg" id="usernameErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='firstName' class="control-label">First Name</label>
+									<input type="text" id='firstName' class="form-control checkField" placeholder="First Name">
+									<span class="help-block errMsg" id="firstNameErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='lastName' class="control-label">Last Name</label>
+									<input type="text" id='lastName' class="form-control checkField" placeholder="Last Name">
+									<span class="help-block errMsg" id="lastNameErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='email' class="control-label">Email</label>
+									<input type="email" id='email' class="form-control checkField" placeholder="Email">
+									<span class="help-block errMsg" id="emailErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='mobile1' class="control-label">Phone Number</label>
+									<input type="tel" id='mobile1' class="form-control checkField" placeholder="Phone Number">
+									<span class="help-block errMsg" id="mobile1Err"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='mobile2' class="control-label">Other Number</label>
+									<input type="tel" id='mobile2' class="form-control" placeholder="Other Number(optional)">
+									<span class="help-block errMsg" id="mobile2Err"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='profession' class="control-label">Profession</label>
+									<input type="text" id='profession' class="form-control checkField" placeholder="Profession">
+									<span class="help-block errMsg" id="professionErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='password' class="control-label">Password</label>
+									<input type="password" id='password' class="form-control checkField" placeholder="Password">
+									<span class="help-block errMsg" id="passwordErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='passwordConf' class="control-label">Confirm Password</label>
+									<input type="password" id='passwordConf' class="form-control checkField" placeholder="Profession">
+									<span class="help-block errMsg" id="passwordConfErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-12">
+									<label for='street' class="control-label">Street</label>
+									<textarea id='street' class="form-control" placeholder="Street"></textarea>
+									<span class="help-block errMsg" id="streetErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label>City:</label>
+									<input type="text" class="form-control" id="city" placeholder="City">
+									<span class="help-block errMsg" id="cityErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label>State:</label>
+									<input type="text" class="form-control" id="state" placeholder="State">
+									<span class="help-block errMsg" id="stateErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label>Country:</label>
+									<input type="text" class="form-control" id="country" placeholder="Country" value="Nigeria">
+									<span class="help-block errMsg" id="countryErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-sm-12">
+									<label>Logo:</label>
+									<input type="file" id='logo' class="form-control">
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="reset" form="addNewStylistForm" class="btn btn-warning pull-left">Reset Form</button>
+						<button type='button' id='addStylistSubmit' class="btn btn-primary">Add Stylist</button>
+						<button type='button' class="btn btn-danger" data-dismiss='modal'>Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--- end of modal to add new user --->
+
+
+		<!--- Modal for editing user details --->
+		<div class='modal fade' id='editUserModal' role="dialog" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class='modal-header'>
+						<button class="close" data-dismiss='modal'>&times;</button>
+						<h4 class="text-center">Edit Stylist Info</h4>
+						<div class="text-center">
+							<i id="fMsgEditIcon"></i>
+							<span id="fMsgEdit"></span>
+						</div>
+					</div>
+					<div class="modal-body">
+						<form id='editUserForm' name='editUserForm' role='form'>
+							<div class="row">                    
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='usernameEdit' class="control-label">Username</label>
+									<input type="text" id='usernameEdit' class="form-control" placeholder="Username">
+									<span class="help-block" id="usernameEditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='firstNameEdit' class="control-label">First Name</label>
+									<input type="text" id='firstNameEdit' class="form-control checkField" placeholder="First Name">
+									<span class="help-block errMsg" id="firstNameEditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='lastNameEdit' class="control-label">Last Name</label>
+									<input type="text" id='lastNameEdit' class="form-control checkField" placeholder="Last Name">
+									<span class="help-block errMsg" id="lastNameEditErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='emailEdit' class="control-label">Email</label>
+									<input type="email" id='emailEdit' class="form-control" placeholder="Email (optional)">
+									<span class="help-block errMsg" id="emailEditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-6">
+									<label for='mobile1Edit' class="control-label">Phone Number</label>
+									<input type="tel" id='mobile1Edit' class="form-control checkField" placeholder="Phone Number">
+									<span class="help-block errMsg" id="mobile1EditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-6">
+									<label for='mobile2Edit' class="control-label">Other Number</label>
+									<input type="tel" id='mobile2Edit' class="form-control" placeholder="Other Number (optional)">
+									<span class="help-block errMsg" id="mobile2EditErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-12">
+									<label for='professionEdit' class="control-label">Profession</label>
+									<input type="text" id='professionEdit' class="form-control checkField" placeholder="Profession">
+									<span class="help-block errMsg" id="professionEditErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-12">
+									<label for='streetEdit' class="control-label">Street</label>
+									<textarea id='streetEdit' class="form-control checkField" placeholder="Street"></textarea>
+									<span class="help-block errMsg" id="streetEditErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for="cityEdit" class="control-label">City:</label>
+									<input type="text" class="form-control checkField" id="cityEdit" placeholder="City">
+									<span class="help-block errMsg" id="cityEditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for="stateEdit" class="control-label">State:</label>
+									<input type="text" class="form-control checkField" id="stateEdit" placeholder="State">
+									<span class="help-block errMsg" id="stateEditErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for="countryEdit" class="control-label">Country:</label>
+									<input type="text" class="form-control checkField" id="countryEdit" placeholder="Country">
+									<span class="help-block errMsg" id="countryEditErr"></span>
+								</div>
+							</div>
+							
+							<input type="hidden" id="userId">
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="reset" form="editUserForm" class="btn btn-warning pull-left">Reset Form</button>
+						<button type='button' id='editCustSubmit' class="btn btn-primary">Update</button>
+						<button type='button' class="btn btn-danger" data-dismiss='modal'>Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--- end of modal to edit user details
+		<script src="../../js/stylists.js"></script> --->
+
+	</body>
+</html>

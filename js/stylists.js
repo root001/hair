@@ -23,7 +23,7 @@ $(document).ready(function(){
     
     
     //handles the addition of new user details .i.e. when "add user" button is clicked
-    $("#addUserSubmit").click(function(e){    
+    $("#addStylistSubmit").click(function(e){    
         e.preventDefault();
         
         //reset all error msgs in case they are set
@@ -94,7 +94,7 @@ $(document).ready(function(){
         //make ajax request if all is well
         $.ajax({
             method: "POST",
-            url: appRoot+"views/workin/users.php",
+            url: appRoot+"views/workin/Stylist.php",
             data: formInfo,
             cache: false,
             processData: false,
