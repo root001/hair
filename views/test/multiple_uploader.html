@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	
+	<head>
+		<meta charset="UTF-8">
+		<title>Upload Document</title>
+		
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<script src="js/jquery-1.10.2.min.js"></script>
+		
+		<style>
+			img{
+				width:100%;
+				height:200px;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<div class="container">
+			<h1>Image Uploader</h1>
+			
+			<input type="file" name="images[]" id="images" multiple>
+			<hr>
+			<div id="uploads">
+			
+			</div><!-- end #images-to-uploadload -->
+			<hr>
+			
+			<a href="#" class="btn btn-sm btn-success">Upload all images</a>
+			
+		</div><!-- end .container -->
+		
+		<script>
+		
+			//indirect ajax
+			//file collection array
+			var fileCollection = new Array();
+			$("#images").click(function(e){ 
+		//	$('#images').on('change', function(e){
+			
+				var files = e.target.files;
+				
+				$.each(files, function(i, file){
+				
+					fileCollection.push(file);
+				
+					var reader = new FileReader();
+					reader.readAsDataURL(file);
+					
+					reader.onload = function(e){
+					alert(reader.result);
+					$('#uploads').html('<form action="/upload">'+
+							'<img src="'+e.target.result+'">'+
+							'<label>Image Title</label><input type="text" name="title">'+
+							'<button class="btn btn-sm btn-info upload">Upload</button>'+
+							'<a href="#" class="btn btn-sm btn-danger remove">Remove</a>'+
+							'</form>');
+						};
+				});
+			});
+			
+			//form upload ....
+			$(document).on('submit', 'form', function(e){
+				
+				e.preventDefault();
+				//this form index
+				var index = $(this).index();
+				
+				var formdata = new FormData($(this)[0]);
+				
+				//append the file relation to index
+				formdata.append('image', fileCollection[index]);
+				
+				var request = new XMLHttpRequest();
+				request.open('post', 'server.php', true);
+				
+				request.send(formdata);
+			});
+		
+		</script>
+		
+	</body>
+	
+</html>

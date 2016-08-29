@@ -1,0 +1,121 @@
+<head>
+	<!--//jquery 2.1.3 production-->
+	<title>Full Width Responsive Image slider</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale">
+	
+	<!-- CSS -->
+        <link rel="stylesheet" href="../../bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../../bootstrap/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../../font-awesome/css/font-awesome-animation.min.css">
+        <link rel="stylesheet" href="../../css/main.css">
+
+        <!-- JS -->
+	<!--<script type="text/javascript" src="../../js/jquery.min.js"></script>-->
+	<script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+	
+	<script type="text/javascript" src="js/jquery.cycle2.min.js"></script>
+	<script src="../../bootstrap/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		*{
+		padding:0;
+		margin:0;}
+		
+		body {
+		font-family: Sans-Serif;}
+		
+		img{
+		max-width: 100%;}
+		
+		.cycle-slideshow{
+		width: 100%;
+		height: auto;
+		display: block;
+		position: relative;
+		margin: 0 auto;}
+		
+		.cycle-prev, .cycle-next{
+		font-size: 200%;
+		color: #FFF;
+		display: block;
+		position: absolute;
+		top: 50%;
+		margin-top: -16px;
+		z-index: 9999;
+		cusor: pointer;
+		}
+		
+		.cycle-prev{
+		left: 10%;}
+		
+		.cycle-next{
+		right: 10%;}
+		
+		.cycle-pager{
+		width: 100%;
+		display: block;
+		text-align: center;
+		position: absolute;
+		bottom: 20px;
+		z-index: 9999;
+		cusor: pointer;
+		}
+		
+		.cycle-pager span{
+		text-indent: 100%;
+		white-space: nowrap;
+		width: 12px;
+		height: 12px;
+		display: inline-block;
+		border: 1px solid #FFF;
+		border-radius: 50%;
+		margin: 0 10px;}
+		
+		.cycle-pager .cycle-pager-active{
+		background: #FFF;
+		}
+	
+	</style>
+	
+</head>
+
+<body>
+	<div class="cycle-slideshow">
+		<span class="cycle-prev">&#9001;</span>
+		<span class="cycle-next">&#9002;</span>
+		<span class="cycle-pager"></span>
+		<img src="images/AcuraRDX1.jpg" alt="Acura RDX 2016">
+		<img src="images/AcuraRDX2.jpg" alt="Acura RDX 2016">
+		<img src="images/AudiA6L1.jpg" alt="Audi A6L 2016">
+		<img src="images/AudiA6L2.jpg" alt="Audi A6L 2016">
+	
+	</div>
+
+	    <!-- Footer -->
+            <div id="footer">
+                <div class="container">   
+                    <div class="row">                                                         
+                        <!-- Copyright -->                                                       
+                        <div class="col-sm-6 col-md-6 f-copyright">                        
+                            <span>&copy; Copyright Design Aura - All Rights Reserved</span>                        
+                        </div>                      
+                        <div class="col-sm-6 col-md-6">
+                            <!-- Social Icons -->                              
+                            <ul class="footer-social">
+                            <!--<li><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-facebook fa-stack-1x fa-inverse"></i></span></a></li>  -->
+                                <li>
+                                    <a href="http://www.facebook.com" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-facebook fa-stack-1x fa-inverse"></i></span></a></li>
+                                <li><a href="http://www.twitter.com" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-twitter fa-stack-1x fa-inverse"></i></span></a></li>
+                                <li><a href="http://www.skype.com/myskypename" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-skype fa-stack-1x fa-inverse"></i></span></a></li>
+                                <li><a href="https://www.pinterest.com/" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-pinterest fa-stack-1x fa-inverse"></i></span></a></li>
+                                <li><a href="https://www.instagram.com/" target="_blank"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x"></i><i class="fa fa-instagram fa-stack-1x fa-inverse"></i></span></a></li>
+                            </ul>
+                        </div>
+                    </div><!-- /row -->
+                </div><!-- /container -->
+            </div>        
+            <!-- End Footer -->
+			
+</body>

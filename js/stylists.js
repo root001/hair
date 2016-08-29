@@ -27,8 +27,7 @@ $(document).ready(function(){
         e.preventDefault();
         
         //reset all error msgs in case they are set
-        changeInnerHTML(['usernameErr', 'firstNameErr', 'lastNameErr', 'mobile1Err', 'mobile2Err', 'emailErr', 'streetErr', 
-            'cityErr', 'stateErr', 'countryErr', 'professionErr', 'passwordErr', 'passwordConfErr'], "");
+        changeInnerHTML(['usernameErr', 'firstNameErr', 'lastNameErr', 'mobile1Err', 'mobile2Err', 'emailErr','workdayErr','fromtimeErr','totimeErr','aboutErr','streetErr', 'cityErr', 'stateErr', 'countryErr', 'passwordErr', 'passwordConfErr'], "");
         
         var username = $("#username").val();
         var firstName = $("#firstName").val();
@@ -36,7 +35,10 @@ $(document).ready(function(){
         var mobile1 = $("#mobile1").val();
         var mobile2 = $("#mobile2").val();
         var email = $("#email").val();
-        var profession = $("#profession").val();
+        var about = $("#about").val();
+		var workday = $("#workday").val();
+        var fromtime = $("#fromtime").val();
+        var totime = $("#totime").val();
         var password = $("#password").val();
         var passwordConf = $("#passwordConf").val();
         var street = $("#street").val();
@@ -45,13 +47,13 @@ $(document).ready(function(){
         var country = $("#country").val();
         
         //ensure all required fields are filled
-        if(!username || !firstName || !lastName || !mobile1 || !email || !profession || !password || !passwordConf){
+        if(!username || !firstName || !lastName || !mobile1 || !email || !workday || !password || !passwordConf){
             !firstName ? changeInnerHTML('firstNameErr', "required") : "";
             !lastName ? changeInnerHTML('lastNameErr', "required") : "";
             !mobile1 ? changeInnerHTML('mobile1Err', "required") : "";
             !email ? changeInnerHTML('emailErr', "required") : "";
             !username ? changeInnerHTML('usernameErr', "required") : "";
-            !profession ? changeInnerHTML('professionErr', "required") : "";
+            !workday ? changeInnerHTML('professionErr', "required") : "";
             !password ? changeInnerHTML('passwordErr', "required") : "";
             !passwordConf ? changeInnerHTML('passwordConfErr', "required") : "";
             
@@ -60,9 +62,12 @@ $(document).ready(function(){
         
         
         var logo = document.getElementById('logo').files;
+	//	var portfolio = document.getElementById('portfolio').files;
+		var profile = document.getElementById('profile').files;
 
         //set info to send to server
         var formInfo = new FormData();
+//		var newArray = [];
 
         for (var i = 0; i < logo.length; i++) {
             var file = logo[i];
@@ -70,8 +75,27 @@ $(document).ready(function(){
             // Add the file to the request.
             formInfo.append("logo", file);
         }
-        
-        
+		
+		for (var i = 0; i < profile.length; i++) {
+            var file = profile[i];
+
+            // Add the file to the request.
+            formInfo.append("profile", file);
+        }
+
+	/*	for (var i = 0; i < portfolio.length; i++) {
+		//	alert(portfolio[i]);  
+            var file = portfolio[i];
+            // Add the file to the request.
+            newArray.push(file);
+			var formInfo1 = $.map(newArray, function(value, index) {
+				return [value];
+			});
+			formInfo.append("portfolio",formInfo1);
+		//		alert(formInfo);
+			
+        }**/
+        			
         //add other info to the formInfo obj
         formInfo.append("username", username);
         formInfo.append("first_name", firstName);
@@ -79,14 +103,21 @@ $(document).ready(function(){
         formInfo.append("email", email);
         formInfo.append("mobile_1", mobile1);
         formInfo.append("mobile_2", mobile2);
-        formInfo.append("profession", profession);
+        formInfo.append("about", about);
         formInfo.append("password", password);
         formInfo.append("passwordConf", passwordConf);
+		formInfo.append("work_day", workday);
+        formInfo.append("from_time", fromtime);
+        formInfo.append("to_time", totime);
         formInfo.append("street", street);
         formInfo.append("city", city);
         formInfo.append("state", state);
         formInfo.append("country", country);
         
+	//	alert(formInfo);
+	//	alert(newArray);
+		
+			
         //display message telling user action is being processed
         $("#fMsgIcon").attr('class', spinnerClass);
         $("#fMsg").html(" Processing...");
@@ -106,17 +137,17 @@ $(document).ready(function(){
                     $("#fMsg").css('color', 'green').html("Account created");
                     
                     //reset the form and close the modal
-                    document.getElementById("addNewUserForm").reset();
+                    document.getElementById("addNewStylistForm").reset();
 					
                     //reset the form and close the modal
                     setTimeout(function(){
                         $("#fMsg").html("");
-                        $("#addNewUserModal").modal('hide');
+                        $("#addNewStylistModal").modal('hide');
                     }, 2000);
                     
                     //reset all error msgs in case they are set
                     changeInnerHTML(['usernameErr', 'firstNameErr', 'lastNameErr', 'mobile1Err', 'mobile2Err', 'emailErr', 'streetErr', 
-                        'cityErr', 'stateErr', 'countryErr', 'professionErr', 'passwordErr', 'passwordConfErr'], "");
+                        'cityErr', 'stateErr', 'countryErr', 'aboutErr', 'passwordErr', 'passwordConfErr'], "");
                     
                     //refresh users list table
                     lau_();                    

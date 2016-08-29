@@ -14,9 +14,14 @@
         <script src="../../js/jquery.min.js"></script>
         <script src="../../bootstrap/js/bootstrap.min.js"></script>
         <script src="../../js/main.js"></script>
-		<script src="../../js/stylist.js"></script>
-		<script src="../../js/verify.notify.min.js"></script>
+		<script src="../../js/stylists.js"></script>
 		
+		<!-- Css inline -->
+		<style>
+			body .row{
+				padding-top:10px;
+			}
+		</style>
 	</head>
 	
 	<body>
@@ -135,13 +140,13 @@
 						
 							<div class="row">
 								<div class="col-sm-12">
-									<center><img src="" id='picture' class="img-responsive" width="600px" height="400px"></center>
-									<br>
-									<label>Change Image(max file size; 500kb):</label>
-									<input type="file" id="picture" class="form-control">
+									<center><img src="" class="img-responsive" id="profileImg"></center>
+									<label>Profile Image(max file size; 500kb):</label>
+									<input type="file" id='profile' class="form-control">
+									<span class='help-block errMsg' id='profileErr'></span>
 								</div>
 							</div>
-							<div class="row">
+							<div class="row" >
 								<div class="form-group-sm col-sm-4">
 									<label for='username' class="control-label">Username</label>
 									<input type="text" id='username' class="form-control checkField" placeholder="Username">
@@ -149,40 +154,17 @@
 								</div>
 								<div class="form-group-sm col-sm-4">
 									<label for='firstName' class="control-label">First Name</label>
-									<input type="text" id='firstName' class="form-control checkField" placeholder="First Name">
+									<input type="text" id='firstName' class="form-control checkField" placeholder="First Name" data-validate="required">
 									<span class="help-block errMsg" id="firstNameErr"></span>
 								</div>
 								<div class="form-group-sm col-sm-4">
 									<label for='lastName' class="control-label">Last Name</label>
-									<input type="text" id='lastName' class="form-control checkField" placeholder="Last Name">
+									<input type="text" id='lastName' class="form-control checkField" placeholder="Last Name" data-validate="required">
 									<span class="help-block errMsg" id="lastNameErr"></span>
 								</div>
 							</div>
 							
 							<div class="row">
-								<div class="form-group-sm col-sm-4">
-									<label for='email' class="control-label">Email</label>
-									<input type="email" id='email' class="form-control checkField" placeholder="Email">
-									<span class="help-block errMsg" id="emailErr"></span>
-								</div>
-								<div class="form-group-sm col-sm-4">
-									<label for='mobile1' class="control-label">Phone Number</label>
-									<input type="tel" id='mobile1' class="form-control checkField" placeholder="Phone Number">
-									<span class="help-block errMsg" id="mobile1Err"></span>
-								</div>
-								<div class="form-group-sm col-sm-4">
-									<label for='mobile2' class="control-label">Other Number</label>
-									<input type="tel" id='mobile2' class="form-control" placeholder="Other Number(optional)">
-									<span class="help-block errMsg" id="mobile2Err"></span>
-								</div>
-							</div>
-							
-							<div class="row">
-								<div class="form-group-sm col-sm-4">
-									<label for='profession' class="control-label">Profession</label>
-									<input type="text" id='profession' class="form-control checkField" placeholder="Profession">
-									<span class="help-block errMsg" id="professionErr"></span>
-								</div>
 								<div class="form-group-sm col-sm-4">
 									<label for='password' class="control-label">Password</label>
 									<input type="password" id='password' class="form-control checkField" placeholder="Password">
@@ -190,8 +172,56 @@
 								</div>
 								<div class="form-group-sm col-sm-4">
 									<label for='passwordConf' class="control-label">Confirm Password</label>
-									<input type="password" id='passwordConf' class="form-control checkField" placeholder="Profession">
+									<input type="password" id='passwordConf' class="form-control checkField" placeholder="Password">
 									<span class="help-block errMsg" id="passwordConfErr"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='email' class="control-label">Email</label>
+									<input type="email" id='email' class="form-control checkField" placeholder="Email" data-validate="required,email">
+									<span class="help-block errMsg" id="emailErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='mobile1' class="control-label">Phone Number</label>
+									<input type="tel" id='mobile1' class="form-control checkField" placeholder="Phone Number" data-validate="required,number">
+									<span class="help-block errMsg" id="mobile1Err"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='mobile2' class="control-label">Other Number</label>
+									<input type="tel" id='mobile2' class="form-control" placeholder="Other Number(optional)" data-validate="required,number">
+									<span class="help-block errMsg" id="mobile2Err"></span>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-4">
+									<label for='workday' class="control-label">Work days</label>
+									<input type="text" id='workday' class="form-control checkField" placeholder="Work days">
+									<span class="help-block errMsg" id="workdayErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-12">
+									<p><b>Work Hours</b></p>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='from' class="control-label">From</label>
+									<input type="time" id='fromtime' class="form-control checkField" placeholder="Work Days">
+									<span class="help-block errMsg" id="fromtimeErr"></span>
+								</div>
+								<div class="form-group-sm col-sm-4">
+									<label for='to' class="control-label">To</label>
+									<input type="time" id='totime' class="form-control checkField" placeholder="Work Days">
+									<span class="help-block errMsg" id="totimeErr"></span>
+								</div>
+								
+							</div>
+							
+							<div class="row">
+								<div class="form-group-sm col-sm-12">
+									<label for='about' class="control-label">About</label>
+									<textarea id='about' class="form-control" placeholder="More about you..."></textarea>
+									<span class="help-block errMsg" id="aboutErr"></span>
 								</div>
 							</div>
 							
@@ -227,6 +257,7 @@
 									<input type="file" id='logo' class="form-control">
 								</div>
 							</div>
+					
 						</form>
 					</div>
 					<div class="modal-footer">
