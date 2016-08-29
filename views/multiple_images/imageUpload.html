@@ -9,7 +9,7 @@
 
 	<style>
 		div.rounded {
-		width: 100%;
+		width: 50%;
 		border-style: solid;
 		border-width: 1px;
 		border-radius: 5px;
@@ -94,7 +94,7 @@
 				header = row.insertCell(-1);
 				header.style.width = (100 / imagesPerRow) + "%";
 			}
-
+				alert(chooseFiles);
 			chooseFiles.addEventListener("change", PreviewImages, false);
 		}, false);
 	}(window));

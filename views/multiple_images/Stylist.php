@@ -110,7 +110,7 @@
     function add(){
 		$inserted_id = "";
             echo 'checkpoint 2<br>';
-			var_dump($_POST); var_dump($_FILES['image']['name']); die;
+			var_dump($_POST); var_dump($_FILES); die;
 		//	echo $_POST["lastName"] . $_POST('email');
             //move logo to disk and get url if logo was uploaded
             if(!empty($_FILES['logo']['tmp_name']) and !empty($_FILES['profile']['tmp_name'])){
