@@ -38,11 +38,11 @@ img{max-width:100%;height:auto;}
 
 .post .media-blog{position:relative;}
 
-#timeline{list-style-type:none;background:url("../../../all/themes/orane/assets/images/timeline.png") repeat-y scroll center top rgba(0,0,0,0);margin:0 0 40px 0px;overflow:hidden;padding:0;position:relative;}
+#timeline{list-style-type:none;background:url("../../../images/orane/timeline.png") repeat-y scroll center top rgba(0,0,0,0);margin:0 0 40px 0px;overflow:hidden;padding:0;position:relative;}
 
-#timeline .timeline-item{clear:both;float:left;margin:0 10px;padding:0;background:url("../../../all/themes/orane/assets/images/timeline1.png") no-repeat scroll right center rgba(0,0,0,0);}
+#timeline .timeline-item{clear:both;float:left;margin:0 10px;padding:0;background:url("../../../images/orane/timeline1.png") no-repeat scroll right center rgba(0,0,0,0);}
 
-#timeline .timeline-item:nth-child(2n){background:url("../../../all/themes/orane/assets/images/timeline2.png") no-repeat scroll left center rgba(0,0,0,0);float:right;}
+#timeline .timeline-item:nth-child(2n){background:url("../../../images/orane/timeline2.png") no-repeat scroll left center rgba(0,0,0,0);float:right;}
 
 #timeline .timeline-item:nth-child(2n) .blog-item-timeline{margin-left:60px;margin-right:0;}
 

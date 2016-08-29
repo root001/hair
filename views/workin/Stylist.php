@@ -108,9 +108,11 @@
      * To add new user (admin can do this, perhaps for a limited time)
      */
     function add(){
+		global $mysqli;
+		
 		$inserted_id = "";
             echo 'checkpoint 2<br>';
-		//	var_dump($_POST); var_dump($_FILES); die;
+			var_dump($_POST); var_dump($_FILES); die;
 		//	echo $_POST["lastName"] . $_POST('email');
             //move logo to disk and get url if logo was uploaded
             if(!empty($_FILES['logo']['tmp_name']) and !empty($_FILES['profile']['tmp_name'])){
@@ -125,7 +127,7 @@
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
                     ? 
-						insertData($mysqli);
+						insertData($mysqli)
                     : 
 					"";
 					
@@ -183,7 +185,7 @@
     */
     
     
-    private function upload_logo($file, $email, $upload_dir){
+    function upload_logo($file, $email, $upload_dir){
         $json = [];
 		$num_files = 1;
         

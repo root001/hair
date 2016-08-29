@@ -27,7 +27,7 @@
 			</div><!-- end #images-to-uploadload -->
 			<hr>
 			
-			<a href="#" class="btn btn-sm btn-success">Upload all images</a>
+			<a href="#" id="upload" class="btn btn-sm btn-success">Upload all images</a>
 			
 		</div><!-- end .container -->
 		
@@ -78,6 +78,66 @@
 				request.send(formdata);
 			});  */
 		
+		$("#upload").click(function(e){    
+        e.preventDefault();
+        
+		var profile = document.getElementById('images').files;
+
+        //set info to send to server
+        var formInfo = new FormData();
+//		var newArray = [];
+		alert(profile.length);
+		for (var i = 0; i < profile.length; i++) {
+            var file = profile[i];
+
+            // Add the file to the request.
+            formInfo.append("profile", file);
+        }
+			alert(formInfo);
+	/*	for (var i = 0; i < portfolio.length; i++) {
+		//	alert(portfolio[i]);  
+            var file = portfolio[i];
+            // Add the file to the request.
+            newArray.push(file);
+			var formInfo1 = $.map(newArray, function(value, index) {
+				return [value];
+			});
+			formInfo.append("portfolio",formInfo1);
+		//		alert(formInfo);
+			
+        }**/	
+			
+        //make ajax request if all is well
+        $.ajax({
+            method: "POST",
+            url: "../workin/Stylist.php",
+            data: formInfo,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function(returnedData){
+                $("#fMsgIcon").removeClass();//remove spinner
+                
+                if(returnedData.status === 1){
+                    $("#fMsg").css('color', 'green').html("Account created");       
+                }
+                
+                else{
+                    //display error message returned
+                    $("#fMsg").css('color', 'red').html(returnedData.msg);
+
+                    $("#logoErr").html(returnedData.logo);
+                }
+            }).fail(function(){
+                if(!navigator.onLine){
+                    $("#fMsg").css('color', 'red').text("Network error! Pls check your network connection");
+                }
+                
+                else{
+                    $("#fMsg").css('color', 'red').text("Unable to process your reuest at this time");
+                }
+            });
+    });
 		</script>
 		
 	</body>
