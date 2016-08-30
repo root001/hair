@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Mirrored from thevectorlab.net/slicklab/advanced-components.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 06 Nov 2015 14:35:22 GMT -->
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -13,6 +12,9 @@
 
     <!--common style-->
     <link href="css/style.css" rel="stylesheet">
+	
+    <!--tagsinput-->
+    <link href="css/tagsinput.css" rel="stylesheet">
 
 </head>
 
@@ -26,11 +28,32 @@
         <div class="body-content" style="min-height: 1000px;">
 
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-8">
 
+				<section class="panel">
+                    <header class="panel-heading">
+                        Style Tags
+                        <span class="tools pull-right">
+                            <a class="fa fa-repeat box-refresh" href="javascript:;"></a>
+                            <a class="t-collapse fa fa-chevron-down" href="javascript:;"></a>
+                        </span>
+
+                    </header>
+                    <div class="panel-body">
+
+                        <form rote="form">
+                            <div class="form-group">
+                                <label class="control-label">Styles:</label>
+                                <input type="text" class="tags tags-input" data-type="tags" value=""/>
+                            </div>
+
+                        </form>
+                    </div>
+                </section>
+			
                 <section class="panel">
                     <header class="panel-heading">
-                        Dropzone
+                        Portfolios:
                     <span class="tools pull-right">
                         <a class="fa fa-repeat box-refresh" href="javascript:;"></a>
                         <a class="t-collapse fa fa-chevron-down" href="javascript:;"></a>
@@ -42,6 +65,7 @@
 						</form>
                     </div>
                 </section>
+			
 				</div>
             </div>
         </div>
@@ -58,6 +82,12 @@
 
 <!--right slidebar--affects refresh and collapse as well as scroll-->
 <script src="js/slidebars.min.js"></script>
+
+<!--tags input-->
+<script src="js/tags-input.js"></script>
+
+<!--tags input init-->
+<script src="js/tags-input-init.js"></script>
 
 <!--dropzone-- affects dropzone-->
 <script src="js/dropzone.js"></script>
