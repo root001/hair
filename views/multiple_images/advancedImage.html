@@ -44,9 +44,9 @@
                         <form rote="form">
                             <div class="form-group">
                                 <label class="control-label">Styles:</label>
-                                <input type="text" class="tags tags-input" data-type="tags" value=""/>
+                                <input type="text" id="input_tags" class="tags tags-input" data-type="tags" value=""/>
                             </div>
-
+							<button type='button' id='uploadStyle' class="btn btn-primary">Add Styles</button> 
                         </form>
                     </div>
                 </section>
@@ -95,6 +95,50 @@
 <!--common scripts for all pages--affects refresh and collapse as well as scroll-->
 <script src="js/scripts.js"></script>
 
+<script>
+	$("#uploadStyle").click(function(e){    
+        e.preventDefault();
+        
+		var tags = document.getElementById('input_tags').value;
+	//	alert(tags);
+        //set info to send to server
+        var formInfo = new FormData();
+
+		formInfo.append("input_tag", tags);
+		alert(formInfo);	
+			
+        //make ajax request if all is well
+        $.ajax({
+            method: "POST",
+            url: "../multiple_images/Stylist.php",
+            data: formInfo,
+            cache: false,
+            processData: false,
+            contentType: false
+        }).done(function(returnedData){
+                $("#fMsgIcon").removeClass();//remove spinner
+                
+                if(returnedData.status === 1){
+                    $("#fMsg").css('color', 'green').html("Account created");       
+                }
+                
+                else{
+                    //display error message returned
+                    $("#fMsg").css('color', 'red').html(returnedData.msg);
+
+                    $("#logoErr").html(returnedData.logo);
+                }
+            }).fail(function(){
+                if(!navigator.onLine){
+                    $("#fMsg").css('color', 'red').text("Network error! Pls check your network connection");
+                }
+                
+                else{
+                    $("#fMsg").css('color', 'red').text("Unable to process your reuest at this time");
+                }
+            });
+    });
+</script>
 
 
 </body>
