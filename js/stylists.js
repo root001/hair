@@ -57,9 +57,10 @@ $(document).ready(function(){
             !password ? changeInnerHTML('passwordErr', "required") : "";
             !passwordConf ? changeInnerHTML('passwordConfErr', "required") : "";
             
+			!password == passwordConf ? changeInnerHTML('passwordConfErr', "not matching") : "";
+			
             return;
         }
-        
         
         var logo = document.getElementById('logo').files;
 	//	var portfolio = document.getElementById('portfolio').files;
@@ -131,6 +132,7 @@ $(document).ready(function(){
             processData: false,
             contentType: false
         }).done(function(returnedData){
+			alert(returnedData);
                 $("#fMsgIcon").removeClass();//remove spinner
                 
                 if(returnedData.status === 1){
@@ -148,9 +150,7 @@ $(document).ready(function(){
                     //reset all error msgs in case they are set
                     changeInnerHTML(['usernameErr', 'firstNameErr', 'lastNameErr', 'mobile1Err', 'mobile2Err', 'emailErr', 'streetErr', 
                         'cityErr', 'stateErr', 'countryErr', 'aboutErr', 'passwordErr', 'passwordConfErr'], "");
-                    
-                    //refresh users list table
-                    lau_();                    
+                                      
                 }
                 
                 else{
@@ -173,6 +173,7 @@ $(document).ready(function(){
                     $("#logoErr").html(returnedData.logo);
                 }
             }).fail(function(){
+				alert('no data seen');
                 if(!navigator.onLine){
                     $("#fMsg").css('color', 'red').text("Network error! Pls check your network connection");
                 }

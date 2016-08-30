@@ -11,6 +11,7 @@
 		}**/
 		
 	echo "starting....";
+	
 	add();
     /*
     ********************************************************************************************************************************
@@ -109,11 +110,23 @@
      */
     function add(){
 		global $mysqli;
+		$logo_info = "";
+		$profile_info = "";
 		
 		$inserted_id = "";
-            echo 'checkpoint 2<br>';
-			var_dump($_POST); var_dump($_FILES); die;
+		
+		$fieldmbl = "mobile_1";
+		$fieldDatambl = $_POST['mobile_1'];
+		$fielduser = "username";
+		$fieldDatauser = $_POST['username'];
+		$fieldem = "email";
+		$fieldDataem = $_POST['email'];
+		
+		if(crosscheckFieldData($mysqli, $fieldDatambl, "", $fieldmbl) || crosscheckFieldData($mysqli, $fieldDatauser, "", $fielduser)|| crosscheckFieldData($mysqli, $fieldDataem, "", $fieldem) !== FALSE){
+
+		//	var_dump($_POST); var_dump($_FILES); die;
 		//	echo $_POST["lastName"] . $_POST('email');
+		
             //move logo to disk and get url if logo was uploaded
             if(!empty($_FILES['logo']['tmp_name']) and !empty($_FILES['profile']['tmp_name'])){
                 /*
@@ -127,7 +140,7 @@
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
                     ? 
-						insertData($mysqli)
+						insertData($mysqli, $logo_info, $profile_info)
                     : 
 					"";
 					
@@ -162,17 +175,26 @@
                  * function header: add($username, $first_name, $last_name, $email, $profession, $mobile_1, $mobile_2, $password, $logo
                  * $street, $city, $state, $country)**/
                  
-                insertData($mysqli);
+                insertData($mysqli, $logo_info, $profile_info);
                 //send welcome email to user
                 //$inserted_id ? $this->genlib->sendWelcomeMessage($membershipId, $memberName, set_value('email')) : "";
 
                 $json['status'] = $inserted_id ? 1 : 0;
             
             }
-                    
+        }
+        else{
+            //return all error messages
+         //   $json = $this->form_validation->error_array();//get an array of all errors
+            
+            $json['msg'] = "One or more required fields are empty or not correctly filled";
+            $json['status'] = 0;
+        }          
+			echo "<br>Finished with the php part of the script, parsiing out:  <br>"; var_dump(json_encode($json));
      //   $this->output->set_content_type('application/json')->set_output(json_encode($json));
 			header('Content-type: application/json');
 			return json_encode($json);
+			
     }
     
     
@@ -231,6 +253,9 @@
 			   if (!is_uploaded_file($file_tmp)) {
 				  //print error message and file number.
 				  echo "File: Not selected.<br><br>";
+				  $status = 0;
+				  $logo_url = "";
+					$msg = "File: Not selected.";
 			   }else{
 					 #-----------------------------------------------------------#
 					 # this code will check file extension                       #
@@ -239,6 +264,9 @@
 					 $ext = strrchr($name,'.');
 					 if (!in_array(strtolower($ext),$config['allowed_types'])) {
 						echo "File $i: ($name) Wrong file extension.  <br><br>";
+						$status = 0;
+						$logo_url = "";
+						$msg = "File $i: ($name) Wrong file extension.";
 					 }else{
 						   #-----------------------------------------------------------#
 						   # this code will check file size is correct                 #
@@ -246,6 +274,9 @@
 
 						   if ($file_size > $config['max_size']){
 								echo "File : ($name) Faild to upload. File must be no larger than <b>($file_size)</b> in size.";
+								$status = 0;
+								$logo_url = "";
+								$msg = "File : ($name) Faild to upload. File must be no larger than <b>($file_size)</b> in size.";
 						   }else{
 						#-----------------------------------------------------------#
 						# this code check if file is Already EXISTS.                #
@@ -253,6 +284,9 @@
 						$uploadfile = $upload_dir."/{$stringified_email}/".$name;
 								 if(file_exists($uploadfile)){
 									 echo "File: ($name) already exists.    <br><br>";
+									 $status = 0;
+									 $logo_url = "";
+									 $msg = "File: ($name) already exists.";
 								 }else{
 									   #-------------------------------#
 									   # this function will upload the files.         #
@@ -261,7 +295,9 @@
 									   if(move_uploaded_file($file_tmp, $uploadfile) === FALSE) {
 										   
 											$msg = "Sorry, file not uploaded!";
-											$json = ['logo_error_msg'=>$msg, 'status'=>0];
+											$logo_url = "";
+											$status = 0;
+										//	$json = ['logo_error_msg'=>$msg, 'status'=>0];
 											echo "File: Faild to upload.  <br><br>";
 										
 									   }else{
@@ -274,7 +310,9 @@
 											$file_name = $name;//new file name with the extension
 											$logo_url = "download/logo/{$stringified_email}/{$file_name}";//link that will be visible to users
 											
-											$json = ['status'=>1, 'logo_url'=>$logo_url, 'logo_error_msg'=>''];
+											//$json = ['status'=>1, 'logo_url'=>$logo_url, 'logo_error_msg'=>''];
+											$status = 1;
+											$msg = "";
 
 									   }#end of (move_uploaded_file).
 
@@ -289,10 +327,13 @@
 			
 	}   
         else{
-            $json = ['status'=>0, 'logo_error_msg'=>"No image was selected"];
+         //   $json = ['status'=>0, 'logo_error_msg'=>"No image was selected"];
+		 $status = 0;
+			$msg = "No image was selected";
+			$logo_url = "";
         }
         
-        
+       $json = ['status'=>$status, 'logo_url'=>$logo_url, 'logo_error_msg'=>$msg]; 
         return $json;
     }
     
@@ -411,6 +452,17 @@
         }
     }
     
+	/****************************************
+	runs a quick check of string against string value
+	*****************************************/
+	
+	function compare($key, $whole){
+		if (preg_match("/.*{$key}.*/", strtolower($whole))) {
+		//	Echo $key . "found in:" . $whole . '<br />';
+			return true;
+			}
+	}
+
     
     /*
     ********************************************************************************************************************************
@@ -419,7 +471,41 @@
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     */
-    
+    function crosscheckFieldData($mysqli, $fieldData, $user_id, $field){
+		
+        //check db to ensure email was previously used for user with $user_id i.e. the same user we're updating his details
+
+        $sql = "SELECT id, $field FROM Stylist";
+
+	//	echo "$sql";
+		$result = mysqli_query($mysqli, $sql);
+		$sqlresult = "";
+		
+		if (mysqli_num_rows($result) > 0) {
+			// output data of each row
+			while($row = mysqli_fetch_assoc($result)) {
+				
+			//	echo "id: " . $row["id"]. " - Name: " . $row["$field"]. "<br>";
+				$sqlresult = $sqlresult." ".$row["$field"];
+			}
+		} else {
+			echo "0 results";
+		}
+	//	var_dump($sqlresult); //die;
+			//if email does not exist or it exist but was used by current user
+			if(compare($fieldData, $sqlresult)){
+				echo"<br>$field Exists, another $field!";
+				return FALSE;
+			}			
+			else{
+			//	$this->form_validation->set_message('crosscheckEmail', 'This email is already used by another user');	
+				echo"$field Not exists!";				
+				return TRUE;
+			}
+				
+		$mysqli->close();	
+		
+    }
     
     /**
      * Used as a callback while updating cust info to ensure 'email' field does not contain an email already used by another user
@@ -567,12 +653,22 @@
         $this->output->set_content_type('application/json')->set_output(json_encode($json));
     }
     
-	function insertData($mysqli){
+	function insertData($mysqli, $logo_info, $profile_info){
 		$_POST["portfolio"] = "";
+		
+	//	var_dump($logo_info['logo_url']);
+		if(empty($logo_info['logo_url'])){
+			$logo = "No image";
+		}else
+		{$logo = $logo_info['logo_url'];}
+		if(empty($profile_info['logo_url'])){
+			$profile = "No image";
+		}else
+		{$profile = $profile_info['logo_url'];}
 
-		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["firstName"]."', '".$_POST["lastName"]."', '".$_POST["email"]."', '".$_POST["mobile1"]."', '".$_POST["mobile2"]."', '".$_POST["password"]."', '".$_POST["logo"]."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["fromtime"]."', '".$_POST["totime"]."', '".$_POST["workday"]."', '".$_POST["picture"]."', '".$_POST["portfolio"]."')" ) ) {
+		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')" ) ) {
 			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["firstName"]."', '".$_POST["lastName"]."', '".$_POST["email"]."', '".$_POST["mobile1"]."', '".$_POST["mobile2"]."', '".$_POST["password"]."', '".$_POST["logo"]."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["fromtime"]."', '".$_POST["totime"]."', '".$_POST["workday"]."', '".$_POST["picture"]."', '".$_POST["portfolio"]."')") ){
+			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
 				echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			}
 			echo "Stylist created successfully";

@@ -91,7 +91,7 @@
             var file = profile[i];
 
             // Add the file to the request.
-            formInfo.append("profile", file);
+            formInfo.append("profile[]", file);
         }
 			alert(formInfo);
 	/*	for (var i = 0; i < portfolio.length; i++) {
@@ -110,7 +110,7 @@
         //make ajax request if all is well
         $.ajax({
             method: "POST",
-            url: "../workin/Stylist.php",
+            url: "../multiple_images/Stylist.php",
             data: formInfo,
             cache: false,
             processData: false,
