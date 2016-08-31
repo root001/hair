@@ -9,6 +9,8 @@
 
     <!--dropzone-->
     <link href="css/dropzone.css" rel="stylesheet">
+	
+	<link rel="stylesheet" type="text/css" href="js/bootstrap-fileinput-master/css/fileinput.css" />
 
     <!--common style-->
     <link href="css/style.css" rel="stylesheet">
@@ -30,6 +32,32 @@
         <div class="row">
             <div class="col-lg-8">
 
+				<section class="panel">
+                        <header class="panel-heading">
+                            Our Deals
+                        </header>
+                        <div class="panel-body">
+                            <form role="form">
+                                <div class="form-group">
+                                    <label for="dealName">Name</label>
+                                    <input type="text" class="form-control" id="name" placeholder="Enter Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dealDescription">Description</label>
+                                    <input type="text" class="form-control" id="description" placeholder="Tell us about your deal">
+                                </div>
+                                <div class="form-group">
+                                    <label>Image: </label>
+                                    <input id="dealImage" class="file" type="file">
+
+                                </div>
+                                
+                                <button type="submit" id="submitDeal" class="btn btn-info">Submit</button>
+                            </form>
+
+                        </div>
+                    </section>
+				
 				<section class="panel">
                     <header class="panel-heading">
                         Style Tags
@@ -94,6 +122,10 @@
 
 <!--common scripts for all pages--affects refresh and collapse as well as scroll-->
 <script src="js/scripts.js"></script>
+
+<!--bootstrap-fileinput-master-->
+<script type="text/javascript" src="js/bootstrap-fileinput-master/js/fileinput.js"></script>
+<script type="text/javascript" src="js/file-input-init.js"></script>
 
 <script>
 	$("#uploadStyle").click(function(e){    

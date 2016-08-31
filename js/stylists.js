@@ -164,7 +164,7 @@ $(document).ready(function(){
                     $("#emailErr").html(returnedData.email);
                     $("#mobile1Err").html(returnedData.mobile_1);
                     $("#mobile2Err").html(returnedData.mobile_2);
-                    $("#professionErr").html(returnedData.profession);
+                    $("#aboutErr").html(returnedData.about);
                     $("#passwordErr").html(returnedData.password);
                     $("#passwordConfErr").html(returnedData.passwordConf);
                     $("#cityErr").html(returnedData.city);

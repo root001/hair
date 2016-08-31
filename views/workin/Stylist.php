@@ -180,7 +180,7 @@
                 //$inserted_id ? $this->genlib->sendWelcomeMessage($membershipId, $memberName, set_value('email')) : "";
 
                 $json['status'] = $inserted_id ? 1 : 0;
-            
+				$json['logo_error'] = $logo_info['logo_error_msg'];
             }
         }
         else{
@@ -190,10 +190,12 @@
             $json['msg'] = "One or more required fields are empty or not correctly filled";
             $json['status'] = 0;
         }          
-			echo "<br>Finished with the php part of the script, parsiing out:  <br>"; var_dump(json_encode($json));
+		//	echo "<br>Finished with the php part of the script, parsiing out:  <br>"; echo(json_encode($json));
      //   $this->output->set_content_type('application/json')->set_output(json_encode($json));
-			header('Content-type: application/json');
-			return json_encode($json);
+	//		header('Content-type: application/json');
+		//	echo "Message output: ".json_encode($json);
+		 $output = ['error'=>'No files were processed.'];
+		 echo json_encode($output);
 			
     }
     

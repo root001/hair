@@ -11,50 +11,9 @@
 		}**/
 		
 	echo "starting....";
-	add();
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    /**
-     * lau_ = "Load all users"
-     */
-    function lau_(){
-        //set the sort order
-        $order_by = $this->input->get('orderBy', TRUE) ? $this->input->get('orderBy', TRUE) : "first_name";
-        $order_format = $this->input->get('orderFormat', TRUE) ? $this->input->get('orderFormat', TRUE) : "ASC";
-        
-        //count the total users in db
-        $total_users = $this->db->count_all('users');
-        
-        $this->load->library('pagination');
-        
-        $page_number = $this->uri->segment(3, 0);//set page number to zero if the page number is not set in the third segment of uri
 	
-        $limit = $this->input->get('limit', TRUE) ? $this->input->get('limit', TRUE) : 10;//show $limit per page
-        $start = $page_number == 0 ? 0 : ($page_number - 1) * $limit;//start from 0 if $page_number is 0, else start from the next iteration
-        
-        //call setPaginationConfig($totalRows, $urlToCall, $limit, $attributes, $uri_segment=3) in genlib to configure pagination
-        $config = $this->genlib->setPaginationConfig($total_users, "users/lau_", $limit, ['class'=>'lnp'], "");
-        
-        $this->pagination->initialize($config);//initialize the library class
-        
-        //get all users from db
-        $data['all_users'] = $this->user->get_all($order_by, $order_format, $start, $limit);
-        $data['range'] = $total_users > 0 ? ($start+1) . "-" . ($start + count($data['all_users'])) . " of " . $total_users : "";
-        $data['links'] = $this->pagination->create_links();//page links
-        $data['sn'] = $start+1;
-        
-        $json['usersTable'] = $this->load->view('users/all_users', $data, TRUE);//get view with populated customers table
-
-        $this->output->set_content_type('application/json')->set_output(json_encode($json));
-    }
-    
-    
+	add();
+ 
     /*
     ********************************************************************************************************************************
     ********************************************************************************************************************************
@@ -95,7 +54,40 @@
         }
     }
     
-    
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    */
+    function addTextToDB(){
+		global $mysqli;
+			
+		$inserted_id = 0;
+		
+			var_dump($_POST); var_dump($_FILES); die;
+		
+            //move logo to disk and get url if logo was uploaded
+            if(!empty($_POST['logo']) ){
+                
+                //insert details if logo was uploaded successfully
+                $inserted_id = 1 
+						
+				insertData($mysqli, $logo_info, $profile_info);
+					
+                $json['status'] = 1;
+                $json['logo_error'] = $logo_info['logo_error_msg'];
+            }
+            else{
+                $json['status'] = 0;
+				$json['logo_error'] = "no data found";
+            }
+        
+			header('Content-type: application/json');
+			echo "Message output: ".json_encode($json);
+			
+    }
     /*
     ********************************************************************************************************************************
     ********************************************************************************************************************************
@@ -108,51 +100,33 @@
      * To add new user (admin can do this, perhaps for a limited time)
      */
     function add(){
+		global $mysqli;
+		
+		$portfolio_info = "";		
 		$inserted_id = "";
-            echo 'checkpoint 2<br>';
+		$user_id = 1;
+		
 			var_dump($_POST); var_dump($_FILES); die;
-		//	echo $_POST["lastName"] . $_POST('email');
+		
             //move logo to disk and get url if logo was uploaded
-            if(!empty($_FILES['logo']['tmp_name']) and !empty($_FILES['profile']['tmp_name'])){
+            if(!empty($_FILES['logo']['tmp_name']) ){
                 /*
                  * upload_logo method will try to upload file and return status based on the success or failure of the upload
                  * The status and msg will be returned to the client.
                  */
 				
-                $logo_info = upload_logo($_FILES['logo'], $_POST['email'], "../hair_stylists/logo" );
-				$profile_info = upload_logo($_FILES['profile'], $_POST['email'], "../hair_stylists/profile" );
+                $logo_info = upload_logo($_FILES['logo'], $_POST['email'], "../hair_stylists/portfolio" );
 				
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
                     ? 
-						insertData($mysqli)
+						insertData($mysqli, $logo_info, $profile_info)
                     : 
 					"";
 					
                 $json['status'] = $inserted_id ? 1 : 0;
                 $json['logo_error'] = $logo_info['logo_error_msg'];
             }
-			/**elseif(!empty($_POST['portfolio'])){
-				echo $_POST['portfolio'];
-				$arr = explode(',', $_POST['portfolio']);
-				var_dump(get_object_vars($arr[0] ));
-				foreach($_POST['portfolio'] as $key=>$value){
-					var_dump($value); exit;
-				$portfolio_info = upload_logo($portfolioimg, $_POST['email'], "../hair_stylists/portfolio" );
-				}
-				die;
-				//insert details if logo was uploaded successfully
-                $inserted_id = $logo_info['status'] === 1 
-                    ? 
-                 /*   $this->user->add(set_value('username'), set_value('first_name'), set_value('last_name'), set_value('email'), 
-                    set_value('profession'), set_value('mobile_1'), set_value('mobile_2'), set_value(password_hash('password', PASSWORD_BCRYPT)), 
-                    $logo_info['logo_url'], set_value('street'), set_value('city'), set_value('state'), set_value('country')) 
-                    : 
-					"";
-					
-                $json['status'] = $inserted_id ? 1 : 0;
-                $json['logo_error'] = $logo_info['logo_error_msg'];
-			}*/
             else{
             echo "send data to db minus imgs";
                 /**
@@ -160,17 +134,17 @@
                  * function header: add($username, $first_name, $last_name, $email, $profession, $mobile_1, $mobile_2, $password, $logo
                  * $street, $city, $state, $country)**/
                  
-                insertData($mysqli);
+                insertData($mysqli, $logo_info, $profile_info);
                 //send welcome email to user
                 //$inserted_id ? $this->genlib->sendWelcomeMessage($membershipId, $memberName, set_value('email')) : "";
 
                 $json['status'] = $inserted_id ? 1 : 0;
-            
+				$json['logo_error'] = $logo_info['logo_error_msg'];
             }
-                    
-     //   $this->output->set_content_type('application/json')->set_output(json_encode($json));
+        
 			header('Content-type: application/json');
-			return json_encode($json);
+			echo "Message output: ".json_encode($json);
+			
     }
     
     
@@ -229,6 +203,9 @@
 			   if (!is_uploaded_file($file_tmp)) {
 				  //print error message and file number.
 				  echo "File: Not selected.<br><br>";
+				  $status = 0;
+				  $logo_url = "";
+					$msg = "File: Not selected.";
 			   }else{
 					 #-----------------------------------------------------------#
 					 # this code will check file extension                       #
@@ -237,6 +214,9 @@
 					 $ext = strrchr($name,'.');
 					 if (!in_array(strtolower($ext),$config['allowed_types'])) {
 						echo "File $i: ($name) Wrong file extension.  <br><br>";
+						$status = 0;
+						$logo_url = "";
+						$msg = "File $i: ($name) Wrong file extension.";
 					 }else{
 						   #-----------------------------------------------------------#
 						   # this code will check file size is correct                 #
@@ -244,6 +224,9 @@
 
 						   if ($file_size > $config['max_size']){
 								echo "File : ($name) Faild to upload. File must be no larger than <b>($file_size)</b> in size.";
+								$status = 0;
+								$logo_url = "";
+								$msg = "File : ($name) Faild to upload. File must be no larger than <b>($file_size)</b> in size.";
 						   }else{
 						#-----------------------------------------------------------#
 						# this code check if file is Already EXISTS.                #
@@ -251,6 +234,9 @@
 						$uploadfile = $upload_dir."/{$stringified_email}/".$name;
 								 if(file_exists($uploadfile)){
 									 echo "File: ($name) already exists.    <br><br>";
+									 $status = 0;
+									 $logo_url = "";
+									 $msg = "File: ($name) already exists.";
 								 }else{
 									   #-------------------------------#
 									   # this function will upload the files.         #
@@ -259,7 +245,9 @@
 									   if(move_uploaded_file($file_tmp, $uploadfile) === FALSE) {
 										   
 											$msg = "Sorry, file not uploaded!";
-											$json = ['logo_error_msg'=>$msg, 'status'=>0];
+											$logo_url = "";
+											$status = 0;
+										//	$json = ['logo_error_msg'=>$msg, 'status'=>0];
 											echo "File: Faild to upload.  <br><br>";
 										
 									   }else{
@@ -272,7 +260,9 @@
 											$file_name = $name;//new file name with the extension
 											$logo_url = "download/logo/{$stringified_email}/{$file_name}";//link that will be visible to users
 											
-											$json = ['status'=>1, 'logo_url'=>$logo_url, 'logo_error_msg'=>''];
+											//$json = ['status'=>1, 'logo_url'=>$logo_url, 'logo_error_msg'=>''];
+											$status = 1;
+											$msg = "";
 
 									   }#end of (move_uploaded_file).
 
@@ -287,97 +277,27 @@
 			
 	}   
         else{
-            $json = ['status'=>0, 'logo_error_msg'=>"No image was selected"];
+         //   $json = ['status'=>0, 'logo_error_msg'=>"No image was selected"];
+		 $status = 0;
+			$msg = "No image was selected";
+			$logo_url = "";
         }
         
-        
+       $json = ['status'=>$status, 'logo_url'=>$logo_url, 'logo_error_msg'=>$msg]; 
         return $json;
     }
-    
-    
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    
-    /**
-     * 
-     */
-    function update(){
-        $this->genlib->ajaxOnly();
-        
-        $this->load->library('form_validation');
 
-        $this->form_validation->set_error_delimiters('', '');
-        
-        $this->form_validation->set_rules('title', 'Title', ['trim', 'max_length[25]', 'strtolower', 'ucfirst']);
-        $this->form_validation->set_rules('firstName', 'First name', ['required', 'trim', 'max_length[20]', 'strtolower', 'ucfirst'], 
-                ['required'=>"required"]);
-        $this->form_validation->set_rules('lastName', 'Last name', ['required', 'trim', 'max_length[20]', 'strtolower', 'ucfirst'], 
-                ['required'=>"required"]);
-        $this->form_validation->set_rules('otherName', 'Other names', ['trim', 'max_length[30]', 'strtolower', 'ucfirst']);
-        $this->form_validation->set_rules('mobile1', 'Phone number', ['required', 'trim', 'numeric', 'max_length[15]', 
-            'min_length[11]', 'callback_crosscheckMobile['. $this->input->post('custId', TRUE).']'], ['required'=>"required"]);
-        $this->form_validation->set_rules('mobile2', 'Other number', ['trim', 'numeric', 'max_length[15]', 'min_length[11]']);
-        $this->form_validation->set_rules('email', 'Email', ['required', 'trim', 'valid_email', 'callback_crosscheckEmail['. $this->input->post('custId', TRUE).']']);
-        $this->form_validation->set_rules('gender', 'Gender', ['required', 'trim'], ['required'=>"required"]);
-        $this->form_validation->set_rules('membershipId', 'Membership ID', ['required', 'trim', 'numeric', 
-            'callback_crosscheckMembershipId['. $this->input->post('custId', TRUE).']'], ['required'=>"required"]);
-        $this->form_validation->set_rules('address', 'Address', ['required'], ['required'=>"required"]);
-        $this->form_validation->set_rules('city', 'City', ['required'], ['required'=>"required", 'strtolower', 'ucfirst']);
-        $this->form_validation->set_rules('state', 'State', ['required'], ['required'=>"required", 'strtolower', 'ucfirst']);
-        $this->form_validation->set_rules('country', 'Country', ['required'], ['required'=>"required", 'strtolower', 'ucfirst']);
-        
-        if($this->form_validation->run() !== FALSE){
-            $this->db->trans_start();
-            
-            /**
-             * update info in db
-             * function header: update($customerId, $firstName, $lastName, $otherName, $mobile1, $mobile2, $email, $gender, $address, $city, $state, $country)
-             */
-				
-            $customerId = $this->input->post('custId', TRUE);
+	/****************************************
+	runs a quick check of string against string value
+	*****************************************/
+	
+	function compare($key, $whole){
+		if (preg_match("/.*{$key}.*/", strtolower($whole))) {
+		//	Echo $key . "found in:" . $whole . '<br />';
+			return true;
+			}
+	}
 
-            $updated = $this->customer->update(set_value('title'), $customerId, set_value('firstName'), set_value('lastName'),
-                    set_value('otherName'), set_value('mobile1'), set_value('mobile2'), set_value('email'), set_value('gender'), 
-                    set_value('address'), set_value('city'), set_value('state'), set_value('country'));
-            
-            $membershipId = $this->genmod->gettablecol('customers', 'membershipId', 'custId', $customerId);
-            
-            //insert into eventlog
-            //function header: addevent($event, $eventRowId, $eventDesc, $eventTable, $staffId)
-            $desc = "The details of member with membership ID '$membershipId' was updated";
-            
-            $updated ? $this->genmod->addevent("Member details update", $customerId, $desc, "customers", $this->session->admin_id) : "";
-            
-            $this->db->trans_complete();
-            
-            $json = $updated ? 
-                    ['status'=>1, 'msg'=>"Member info successfully updated"] 
-                    : 
-                    ['status'=>0, 'msg'=>"Oops! Unexpected server error! Pls contact administrator for help. Sorry for the embarrassment"];
-            
-            //notify member of update
-            $memberName = set_value('firstName')." ".set_value('lastName')." ".set_value('otherName');
-            $this->genlib->sendMemberUpdateMsg($memberName, set_value('email'));
-        }
-        
-        else{
-            //return all error messages
-            $json = $this->form_validation->error_array();//get an array of all errors
-            
-            $json['msg'] = "One or more required fields are empty or not correctly filled";
-            $json['status'] = 0;
-        }
-                    
-        $this->output->set_content_type('application/json')->set_output(json_encode($json));
-    }
-    
-    
     
     /*
     ********************************************************************************************************************************
@@ -386,73 +306,42 @@
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     */
-    
-    
-    /**
-     * Used as a callback while updating user's info to ensure 'mobile_1' field does not contain a number already used by another user
-     * @param type $mobile_number
-     * @param type $user_id
-     */
-    function crosscheckMobile($mobile_number, $user_id){
-        //check db to ensure number was previously used for user with $user_id i.e. the same user we're updating
-        $user_with_num = $this->genmod->getTableCol('users', 'id', 'mobile_1', $mobile_number);
-        
-        //if number does not exist or it exist but was used by current user
-        if(!$user_with_num || ($user_with_num == $user_id)){
-            return TRUE;
-        }
-        
-        else{//if it exist and was used by another customer
-            $this->form_validation->set_message('crosscheckMobile', 'This number is already used by another user');
-                
-            return FALSE;
-        }
-    }
-    
-    
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    
-    /**
-     * Used as a callback while updating cust info to ensure 'email' field does not contain an email already used by another user
-     * @param type $email
-     * @param type $user_id
-     */
-    function crosscheckEmail($email, $user_id){
+    function crosscheckFieldData($mysqli, $fieldData, $user_id, $field){
+		
         //check db to ensure email was previously used for user with $user_id i.e. the same user we're updating his details
-        $user_with_email = $this->genmod->getTableCol('users', 'id', 'email', $email);
-        
-        //if email does not exist or it exist but was used by current user
-        if(!$user_with_email || ($user_with_email == $user_id)){
-            return TRUE;
-        }
-        
-        else{
-            $this->form_validation->set_message('crosscheckEmail', 'This email is already used by another user');
-                
-            return FALSE;
-        }
+
+        $sql = "SELECT id, $field FROM Stylist";
+
+	//	echo "$sql";
+		$result = mysqli_query($mysqli, $sql);
+		$sqlresult = "";
+		
+		if (mysqli_num_rows($result) > 0) {
+			// output data of each row
+			while($row = mysqli_fetch_assoc($result)) {
+				
+			//	echo "id: " . $row["id"]. " - Name: " . $row["$field"]. "<br>";
+				$sqlresult = $sqlresult." ".$row["$field"];
+			}
+		} else {
+			echo "0 results";
+		}
+	//	var_dump($sqlresult); //die;
+			//if email does not exist or it exist but was used by current user
+			if(compare($fieldData, $sqlresult)){
+				echo"<br>$field Exists, another $field!";
+				return FALSE;
+			}			
+			else{
+			//	$this->form_validation->set_message('crosscheckEmail', 'This email is already used by another user');	
+				echo"$field Not exists!";				
+				return TRUE;
+			}
+				
+		$mysqli->close();	
+		
     }
-    
-    
-    
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    
-    
-    
+
     /*
     ********************************************************************************************************************************
     ********************************************************************************************************************************
@@ -565,16 +454,50 @@
         $this->output->set_content_type('application/json')->set_output(json_encode($json));
     }
     
-	function insertData($mysqli){
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    
+	Function to pass data into the db, using prepared statement already created on the db and on faliure an sql statement
+    */
+	function insertData($mysqli, $logo_info, $profile_info){
 		$_POST["portfolio"] = "";
+		
+	//	var_dump($logo_info['logo_url']);
+		if(empty($logo_info['logo_url'])){
+			$logo = "No image";
+		}else
+		{$logo = $logo_info['logo_url'];}
+		if(empty($profile_info['logo_url'])){
+			$profile = "No image";
+		}else
+		{$profile = $profile_info['logo_url'];}
 
-		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["firstName"]."', '".$_POST["lastName"]."', '".$_POST["email"]."', '".$_POST["mobile1"]."', '".$_POST["mobile2"]."', '".$_POST["password"]."', '".$_POST["logo"]."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["fromtime"]."', '".$_POST["totime"]."', '".$_POST["workday"]."', '".$_POST["picture"]."', '".$_POST["portfolio"]."')" ) ) {
+		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')" ) ) {
 			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["firstName"]."', '".$_POST["lastName"]."', '".$_POST["email"]."', '".$_POST["mobile1"]."', '".$_POST["mobile2"]."', '".$_POST["password"]."', '".$_POST["logo"]."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["fromtime"]."', '".$_POST["totime"]."', '".$_POST["workday"]."', '".$_POST["picture"]."', '".$_POST["portfolio"]."')") ){
+			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
 				echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			}
 			echo "Stylist created successfully";
 		}
+	}
+	
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    
+	Update stylist with portfolio info, using prepared statement already created on the db and on faliure an sql statement
+    */
+	function updateStylistprofile($mysqli, $user_id, $portfolio){
+
+		if (!$mysqli->query("CALL updateStyPortfolio('".$_POST["id"]."', '".$_POST["portfolio"]."')" ) ) {
+			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			
+		}else{echo "Stylist updated successfully";}
 	}
 	
 	function fetchData($mysqli){
