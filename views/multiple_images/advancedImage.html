@@ -9,8 +9,6 @@
 
     <!--dropzone-->
     <link href="css/dropzone.css" rel="stylesheet">
-	
-	<link rel="stylesheet" type="text/css" href="js/bootstrap-fileinput-master/css/fileinput.css" />
 
     <!--common style-->
     <link href="css/style.css" rel="stylesheet">
@@ -51,7 +49,12 @@
                                     <input id="dealImage" class="file" type="file">
 
                                 </div>
-                                
+                            <!--    <div class="col-sm-12">
+									<center><img src="" class="img-responsive" id="prevImg"></center>
+									<label>Blog Image(max file size; 500kb):</label>
+									<input type="file" id='logo' class="form-control">
+									<span class='help-block errMsg' id='logoErr'></span>
+								</div> -->
                                 <button type="submit" id="submitDeal" class="btn btn-info">Submit</button>
                             </form>
 
@@ -123,10 +126,6 @@
 <!--common scripts for all pages--affects refresh and collapse as well as scroll-->
 <script src="js/scripts.js"></script>
 
-<!--bootstrap-fileinput-master-->
-<script type="text/javascript" src="js/bootstrap-fileinput-master/js/fileinput.js"></script>
-<script type="text/javascript" src="js/file-input-init.js"></script>
-
 <script>
 	$("#uploadStyle").click(function(e){    
         e.preventDefault();
@@ -137,12 +136,12 @@
         var formInfo = new FormData();
 
 		formInfo.append("input_tag", tags);
-		alert(formInfo);	
+	//	alert(formInfo);	
 			
         //make ajax request if all is well
         $.ajax({
             method: "POST",
-            url: "../multiple_images/Stylist.php",
+            url: "Stylist.php",
             data: formInfo,
             cache: false,
             processData: false,
@@ -170,6 +169,9 @@
                 }
             });
     });
+	
+
+	
 </script>
 
 

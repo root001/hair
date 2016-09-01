@@ -8,11 +8,15 @@
 /**	if (!$mysqli->query("DROP PROCEDURE IF EXISTS getStylist") ||
 			!$mysqli->query('CREATE PROCEDURE getStylist() READS SQL DATA BEGIN SELECT * FROM stylist; END;')) {
 			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-		}**/
-		
+		}
+	if (!$mysqli->query("DROP PROCEDURE IF EXISTS addStyles") ||
+			!$mysqli->query('CREATE PROCEDURE addStyles(user_id int(11), styles varchar(225)) BEGIN INSERT styles(user_id, styles)VALUES(user_id, styles); END;')) {
+			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}	**/
 	echo "starting....";
 	
 	add();
+	//addTextToDB();
  
     /*
     ********************************************************************************************************************************
@@ -61,31 +65,31 @@
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     */
-    function addTextToDB(){
+    function addStylesToDB(){
 		global $mysqli;
-			
-		$inserted_id = 0;
+		$user_id = 1;	
+		$json['status'] = 0;
 		
-			var_dump($_POST); var_dump($_FILES); die;
+		//	var_dump($_POST); var_dump($_FILES); die;
 		
             //move logo to disk and get url if logo was uploaded
-            if(!empty($_POST['logo']) ){
+            if(!empty($_POST['input_tag']) ){
                 
-                //insert details if logo was uploaded successfully
-                $inserted_id = 1 
-						
-				insertData($mysqli, $logo_info, $profile_info);
-					
-                $json['status'] = 1;
-                $json['logo_error'] = $logo_info['logo_error_msg'];
+                //insert var details to db
+			/*	if(!$mysqli->query("CALL addStyles('".$user_id."', '".$_POST['input_tag']."')" ) ){
+				echo "Styles added successfully"; }
+				else{ echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;}   $mysqli->errno . $mysqli->error  */
+				
+				$logo_info['msg'] = !$mysqli->query("CALL addStyles('".$user_id."', '".$_POST['input_tag']."')" ) ? $mysqli->errno ." : ". $mysqli->error : $json['status'] = 1;
+				
+                $json['logo_error'] = $logo_info['msg'];
             }
             else{
                 $json['status'] = 0;
 				$json['logo_error'] = "no data found";
             }
         
-			header('Content-type: application/json');
-			echo "Message output: ".json_encode($json);
+			echo json_encode($json);
 			
     }
     /*
@@ -102,25 +106,27 @@
     function add(){
 		global $mysqli;
 		
-		$portfolio_info = "";		
+		$logo_info = "";		
 		$inserted_id = "";
 		$user_id = 1;
+		$user_email = "new_user_".$user_id;
 		
-			var_dump($_POST); var_dump($_FILES); die;
+		//	var_dump($_POST); var_dump($_FILES); die;
 		
             //move logo to disk and get url if logo was uploaded
-            if(!empty($_FILES['logo']['tmp_name']) ){
+            if(!empty($_FILES['file']['tmp_name']) ){
                 /*
                  * upload_logo method will try to upload file and return status based on the success or failure of the upload
                  * The status and msg will be returned to the client.
                  */
 				
-                $logo_info = upload_logo($_FILES['logo'], $_POST['email'], "../hair_stylists/portfolio" );
-				
+                $logo_info = upload_logo($_FILES['file'], $user_email, "../hair_stylists/portfolio" );
+				$portfolio = $logo_info['logo_url'];
+				var_dump($portfolio); die;
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
                     ? 
-						insertData($mysqli, $logo_info, $profile_info)
+						updateStylistprofile($mysqli, $user_id, $portfolio)
                     : 
 					"";
 					
@@ -494,7 +500,7 @@
     */
 	function updateStylistprofile($mysqli, $user_id, $portfolio){
 
-		if (!$mysqli->query("CALL updateStyPortfolio('".$_POST["id"]."', '".$_POST["portfolio"]."')" ) ) {
+		if (!$mysqli->query("CALL updateStyPortfolio('".$user_id."', '".$portfolio."')" ) ) {
 			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			
 		}else{echo "Stylist updated successfully";}
