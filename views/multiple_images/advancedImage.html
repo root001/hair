@@ -146,28 +146,7 @@
             cache: false,
             processData: false,
             contentType: false
-        }).done(function(returnedData){
-                $("#fMsgIcon").removeClass();//remove spinner
-                
-                if(returnedData.status === 1){
-                    $("#fMsg").css('color', 'green').html("Account created");       
-                }
-                
-                else{
-                    //display error message returned
-                    $("#fMsg").css('color', 'red').html(returnedData.msg);
-
-                    $("#logoErr").html(returnedData.logo);
-                }
-            }).fail(function(){
-                if(!navigator.onLine){
-                    $("#fMsg").css('color', 'red').text("Network error! Pls check your network connection");
-                }
-                
-                else{
-                    $("#fMsg").css('color', 'red').text("Unable to process your reuest at this time");
-                }
-            });
+        });
     });
 	
 

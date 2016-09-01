@@ -4,13 +4,20 @@
 	if ($mysqli->connect_errno) {
 		echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 	}
+/**	if (!$mysqli->query("DROP PROCEDURE IF EXISTS insertStylist") ||
+			!$mysqli->query('CREATE PROCEDURE insertStylist(username varchar(25), first_name varchar(20), last_name varchar(20), email varchar(100), mobile_1 varchar(15),mobile_2 varchar(15), password char(60), logo varchar(100), street text, city varchar(20), state varchar(20), country varchar(20),about varchar(60), weekday_hours  TIME, weekend_hours TIME,	work_days varchar(20), picture varchar(100), portfolio varchar(100) )
+			BEGIN
+			INSERT users(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio);
+			END;')) {
+			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}
 	//this should be run only once on a new db. Would have to be edited later...
-/**	if (!$mysqli->query("DROP PROCEDURE IF EXISTS getStylist") ||
+	if (!$mysqli->query("DROP PROCEDURE IF EXISTS getStylist") ||
 			!$mysqli->query('CREATE PROCEDURE getStylist() READS SQL DATA BEGIN SELECT * FROM stylist; END;')) {
 			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
 		}**/
 		
-	echo "starting....";
+//	echo "starting....";
 	
 	add();
     /*
@@ -113,7 +120,7 @@
 		$logo_info = "";
 		$profile_info = "";
 		
-		$inserted_id = "";
+	//	$inserted_id = "";
 		
 		$fieldmbl = "mobile_1";
 		$fieldDatambl = $_POST['mobile_1'];
@@ -147,40 +154,20 @@
                 $json['status'] = $inserted_id ? 1 : 0;
                 $json['logo_error'] = $logo_info['logo_error_msg'];
             }
-			/**elseif(!empty($_POST['portfolio'])){
-				echo $_POST['portfolio'];
-				$arr = explode(',', $_POST['portfolio']);
-				var_dump(get_object_vars($arr[0] ));
-				foreach($_POST['portfolio'] as $key=>$value){
-					var_dump($value); exit;
-				$portfolio_info = upload_logo($portfolioimg, $_POST['email'], "../hair_stylists/portfolio" );
-				}
-				die;
-				//insert details if logo was uploaded successfully
-                $inserted_id = $logo_info['status'] === 1 
-                    ? 
-                 /*   $this->user->add(set_value('username'), set_value('first_name'), set_value('last_name'), set_value('email'), 
-                    set_value('profession'), set_value('mobile_1'), set_value('mobile_2'), set_value(password_hash('password', PASSWORD_BCRYPT)), 
-                    $logo_info['logo_url'], set_value('street'), set_value('city'), set_value('state'), set_value('country')) 
-                    : 
-					"";
-					
-                $json['status'] = $inserted_id ? 1 : 0;
-                $json['logo_error'] = $logo_info['logo_error_msg'];
-			}*/
             else{
-            echo "send data to db minus imgs";
+         //   echo "send data to db minus imgs";
                 /**
                  * insert info into db
                  * function header: add($username, $first_name, $last_name, $email, $profession, $mobile_1, $mobile_2, $password, $logo
                  * $street, $city, $state, $country)**/
                  
-                insertData($mysqli, $logo_info, $profile_info);
+                $inserted_id = insertData($mysqli, $logo_info, $profile_info);
                 //send welcome email to user
                 //$inserted_id ? $this->genlib->sendWelcomeMessage($membershipId, $memberName, set_value('email')) : "";
 
-                $json['status'] = $inserted_id ? 1 : 0;
-				$json['logo_error'] = $logo_info['logo_error_msg'];
+                $json['status'] = $inserted_id['status'];
+				$json['logo_error'] = $inserted_id['msg'];
+			//	var_dump($json, $inserted_id); die;
             }
         }
         else{
@@ -190,12 +177,10 @@
             $json['msg'] = "One or more required fields are empty or not correctly filled";
             $json['status'] = 0;
         }          
-		//	echo "<br>Finished with the php part of the script, parsiing out:  <br>"; echo(json_encode($json));
-     //   $this->output->set_content_type('application/json')->set_output(json_encode($json));
+	//	var_dump($json); //exit;
 	//		header('Content-type: application/json');
-		//	echo "Message output: ".json_encode($json);
-		 $output = ['error'=>'No files were processed.'];
-		 echo json_encode($output);
+		 echo(json_encode($json));
+	//	 echo json_encode($output);
 			
     }
     
@@ -496,12 +481,12 @@
 	//	var_dump($sqlresult); //die;
 			//if email does not exist or it exist but was used by current user
 			if(compare($fieldData, $sqlresult)){
-				echo"<br>$field Exists, another $field!";
+		//		echo"<br>$field Exists, another $field!";
 				return FALSE;
 			}			
 			else{
 			//	$this->form_validation->set_message('crosscheckEmail', 'This email is already used by another user');	
-				echo"$field Not exists!";				
+		//		echo"$field Not exists!";				
 				return TRUE;
 			}
 				
@@ -667,14 +652,20 @@
 			$profile = "No image";
 		}else
 		{$profile = $profile_info['logo_url'];}
-
+/**	
 		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')" ) ) {
-			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
-				echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			}
-			echo "Stylist created successfully";
+		//	echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			*/
+		if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
+			//	echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error; 
+				$json['msg'] = $mysqli->errno ." : ". $mysqli->error;
+				$json['status'] = 0;
+			}else{
+				$json['msg'] = $mysqli->errno;
+			$json['status'] = 1;
+		//	echo "Stylist created successfully";
 		}
+		return $json;
 	}
 	
 	function fetchData($mysqli){

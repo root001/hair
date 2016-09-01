@@ -12,7 +12,13 @@
 	if (!$mysqli->query("DROP PROCEDURE IF EXISTS addStyles") ||
 			!$mysqli->query('CREATE PROCEDURE addStyles(user_id int(11), styles varchar(225)) BEGIN INSERT styles(user_id, styles)VALUES(user_id, styles); END;')) {
 			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-		}	**/
+		}	
+	
+	if (!$mysqli->query("DROP PROCEDURE IF EXISTS add_pimage") ||
+			!$mysqli->query('CREATE PROCEDURE add_pimage(stylist_id int(11), image_url varchar(50)) BEGIN INSERT portfolioimages(stylist_id, image_url)VALUES(stylist_id, image_url); END;')) {
+			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}**/
+		
 	echo "starting....";
 	
 	add();
@@ -74,11 +80,6 @@
 		
             //move logo to disk and get url if logo was uploaded
             if(!empty($_POST['input_tag']) ){
-                
-                //insert var details to db
-			/*	if(!$mysqli->query("CALL addStyles('".$user_id."', '".$_POST['input_tag']."')" ) ){
-				echo "Styles added successfully"; }
-				else{ echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;}   $mysqli->errno . $mysqli->error  */
 				
 				$logo_info['msg'] = !$mysqli->query("CALL addStyles('".$user_id."', '".$_POST['input_tag']."')" ) ? $mysqli->errno ." : ". $mysqli->error : $json['status'] = 1;
 				
@@ -122,11 +123,11 @@
 				
                 $logo_info = upload_logo($_FILES['file'], $user_email, "../hair_stylists/portfolio" );
 				$portfolio = $logo_info['logo_url'];
-				var_dump($portfolio); die;
+			//	var_dump($portfolio); die;
                 //insert details if logo was uploaded successfully
                 $inserted_id = $logo_info['status'] === 1 
                     ? 
-						updateStylistprofile($mysqli, $user_id, $portfolio)
+						$logo_info['logo_error_msg'] = addImage($mysqli, $user_id, $portfolio)
                     : 
 					"";
 					
@@ -139,13 +140,9 @@
                  * insert info into db
                  * function header: add($username, $first_name, $last_name, $email, $profession, $mobile_1, $mobile_2, $password, $logo
                  * $street, $city, $state, $country)**/
-                 
-                insertData($mysqli, $logo_info, $profile_info);
-                //send welcome email to user
-                //$inserted_id ? $this->genlib->sendWelcomeMessage($membershipId, $memberName, set_value('email')) : "";
 
                 $json['status'] = $inserted_id ? 1 : 0;
-				$json['logo_error'] = $logo_info['logo_error_msg'];
+				$json['logo_error'] = "file not seen.";
             }
         
 			header('Content-type: application/json');
@@ -504,6 +501,10 @@
 			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			
 		}else{echo "Stylist updated successfully";}
+	}
+	
+	function addImage($mysqli, $user_id, $portfolio){
+		$logo_info['msg'] = !$mysqli->query("CALL add_pimage('".$user_id."', '".$portfolio."')" ) ? $mysqli->errno ." : ". $mysqli->error : $json['status'] = 1;
 	}
 	
 	function fetchData($mysqli){

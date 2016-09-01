@@ -132,10 +132,13 @@ $(document).ready(function(){
             processData: false,
             contentType: false
         }).done(function(returnedData){
-			alert(returnedData);
+		//	alert(returnedData);
                 $("#fMsgIcon").removeClass();//remove spinner
-                
-                if(returnedData.status === 1){
+                var getData = JSON.parse(returnedData);
+				
+		//	alert(getData.status);
+		//	alert(getData.logo_error);
+                if(getData.status === 1){
                     $("#fMsg").css('color', 'green').html("Account created");
                     
                     //reset the form and close the modal
@@ -155,25 +158,25 @@ $(document).ready(function(){
                 
                 else{
                     //display error message returned
-                    $("#fMsg").css('color', 'red').html(returnedData.msg);
+                    $("#fMsg").css('color', 'red').html(getData.msg);
 
                     //display individual error messages if applied
-                    $("#usernameErr").html(returnedData.username);
-                    $("#firstNameErr").html(returnedData.first_name);
-                    $("#lastNameErr").html(returnedData.last_name);
-                    $("#emailErr").html(returnedData.email);
-                    $("#mobile1Err").html(returnedData.mobile_1);
-                    $("#mobile2Err").html(returnedData.mobile_2);
-                    $("#aboutErr").html(returnedData.about);
-                    $("#passwordErr").html(returnedData.password);
-                    $("#passwordConfErr").html(returnedData.passwordConf);
-                    $("#cityErr").html(returnedData.city);
-                    $("#stateErr").html(returnedData.state);
-                    $("#countryErr").html(returnedData.country);
-                    $("#logoErr").html(returnedData.logo);
+                    $("#usernameErr").html(getData.username);
+                    $("#firstNameErr").html(getData.first_name);
+                    $("#lastNameErr").html(getData.last_name);
+                    $("#emailErr").html(getData.email);
+                    $("#mobile1Err").html(getData.mobile_1);
+                    $("#mobile2Err").html(getData.mobile_2);
+                    $("#aboutErr").html(getData.about);
+                    $("#passwordErr").html(getData.password);
+                    $("#passwordConfErr").html(getData.passwordConf);
+                    $("#cityErr").html(getData.city);
+                    $("#stateErr").html(getData.state);
+                    $("#countryErr").html(getData.country);
+                    $("#logoErr").html(getData.logo);
                 }
             }).fail(function(){
-				alert('no data seen');
+				//alert('no data seen');
                 if(!navigator.onLine){
                     $("#fMsg").css('color', 'red').text("Network error! Pls check your network connection");
                 }
