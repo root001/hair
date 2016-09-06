@@ -640,10 +640,35 @@
         $this->output->set_content_type('application/json')->set_output(json_encode($json));
     }
     
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    password blowfish encryption and salt generation*/
+	  // Original PHP code by Chirp Internet: www.chirp.com.au rounds can be 7, 10, 15
+	function passwrd_crypt($input, $rounds = 10)
+	{
+		$salt = "";
+		$salt_chars = array_merge(range('A','Z'), range('a','z'), range(0,9));
+		for($i=0; $i < 22; $i++) {
+		  $salt .= $salt_chars[array_rand($salt_chars)];
+		}
+		return crypt($input, sprintf('$2a$%02d$', $rounds) . $salt);
+	}
+	
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    inserting stylists data to the database*/
 	function insertData($mysqli, $logo_info, $profile_info){
 		$_POST["portfolio"] = "";
 		
-	//	var_dump($logo_info['logo_url']);
+	//	check the value of logo_url and init to null if it does not exist
 		if(empty($logo_info['logo_url'])){
 			$logo = "No image";
 		}else
@@ -652,11 +677,15 @@
 			$profile = "No image";
 		}else
 		{$profile = $profile_info['logo_url'];}
+	
+	//hashed password
+	$password = passwrd_crypt($_POST["password"]);
+		
 /**	
 		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')" ) ) {
 		//	echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			*/
-		if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
+		if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$password."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
 			//	echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error; 
 				$json['msg'] = $mysqli->errno ." : ". $mysqli->error;
 				$json['status'] = 0;
@@ -668,6 +697,13 @@
 		return $json;
 	}
 	
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    fetching stylists data from the database*/
 	function fetchData($mysqli){
 		
 		if (!($stmt = $mysqli->prepare("CALL getStylist()"))) {

@@ -17,12 +17,32 @@
 	if (!$mysqli->query("DROP PROCEDURE IF EXISTS add_pimage") ||
 			!$mysqli->query('CREATE PROCEDURE add_pimage(stylist_id int(11), image_url varchar(50)) BEGIN INSERT portfolioimages(stylist_id, image_url)VALUES(stylist_id, image_url); END;')) {
 			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
-		}**/
+		}
 		
-	echo "starting....";
+	if (!$mysqli->query("DROP PROCEDURE IF EXISTS add_deals") ||
+			!$mysqli->query('CREATE PROCEDURE add_deals(stylist_id int(11), name varchar(25), description varchar(125), image varchar(100)) BEGIN INSERT deals(stylist_id, name, description, image)VALUES(stylist_id, name, description, image); END;')) {
+			echo "Stored procedure creation failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}	**/
 	
-	add();
-	//addTextToDB();
+	if( !empty($_POST["form"]) && $_POST["form"] == "submitDeal") {
+	//User hit the save button, and handle accordingly
+	echo "Adding deals to stylist";
+		addDeals();
+
+	}
+	
+	if(!empty($_POST["form"]) && $_POST["form"] == "uploadForm"){
+	  //User hit the Submit button, and handle accordingly
+	  echo "Adding style to stylist";
+	  addStylesToDB();
+	}
+	
+	if(empty($_POST["form"]) ){
+	  //User hit the Submit button, and handle accordingly
+	  echo "Adding image to stylist";
+	  add();
+	}
+	
  
     /*
     ********************************************************************************************************************************
@@ -104,6 +124,63 @@
     /**
      * To add new user (admin can do this, perhaps for a limited time)
      */
+    function addDeals(){
+		global $mysqli;
+		
+		$logo_info = "";		
+		$inserted_id = "";
+		$user_id = 1;
+		$json['status'] = 0;
+		$user_email = "new_user_".$user_id;
+		
+		//	var_dump($_POST); var_dump($_FILES); die;
+		
+            //move logo to disk and get url if logo was uploaded
+            if(!empty($_FILES['logo']['tmp_name']) ){
+                /*
+                 * upload_logo method will try to upload file and return status based on the success or failure of the upload
+                 * The status and msg will be returned to the client.
+                 */
+				
+                $logo_info = upload_logo($_FILES['logo'], $user_email, "../hair_stylists/Deals" );
+				$deals = $logo_info['logo_url'];
+			//	var_dump($portfolio); die;
+                //insert details if logo was uploaded successfully
+                $inserted_id = $logo_info['status'] === 1 
+                    ? 
+						$logo_info = add_deals($mysqli, $user_id, $deals)
+                    : 
+					"";
+					
+                $json['logo_error'] = $logo_info['logo_error_msg'];
+                $json['status'] = $logo_info['status'];
+			//	var_dump($logo_info);
+            }
+            else{
+            echo "send data to db minus imgs";
+				$deals = "";
+				
+				$logo_info = add_deals($mysqli, $user_id, $deals);
+			//	var_dump($logo_info);
+                $json['logo_error'] = $logo_info['msg'];
+                $json['status'] = $logo_info['status'];
+            }
+        
+			header('Content-type: application/json');
+			echo "Message output: ".json_encode($json);
+			
+    }
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    */
+    
+    /**
+     * To add new user (admin can do this, perhaps for a limited time)
+     */
     function add(){
 		global $mysqli;
 		
@@ -136,10 +213,6 @@
             }
             else{
             echo "send data to db minus imgs";
-                /**
-                 * insert info into db
-                 * function header: add($username, $first_name, $last_name, $email, $profession, $mobile_1, $mobile_2, $password, $logo
-                 * $street, $city, $state, $country)**/
 
                 $json['status'] = $inserted_id ? 1 : 0;
 				$json['logo_error'] = "file not seen.";
@@ -344,149 +417,28 @@
 		$mysqli->close();	
 		
     }
-
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    /**
-     * To get user's biodata only
-     */
-    function get_user_bio(){
-        $this->genlib->ajaxOnly();
-        
-        $user_id = $this->input->post('user_id', TRUE);
-        
-        //call model to get info
-        $user_info = $this->customer->getCustBio($user_id);
-        
-        if($user_info){
-            
-            foreach($user_info as $get){
-                $json['title'] = $get->title;
-                $json['firstName'] = $get->firstName;
-                $json['lastName'] = $get->lastName;
-                $json['otherName'] = $get->otherName;
-                $json['custId'] = "CUS-ID-".$get->custId;
-                $json['mobile1'] = $get->mobile1;
-                $json['mobile2'] = $get->mobile2;
-                $json['email'] = $get->email;
-                $json['gender'] = $get->gender;
-                $json['membershipId'] = $get->membershipId;
-                $json['address'] = $get->address;
-                $json['city'] = $get->city;
-                $json['state'] = $get->state;
-                $json['country'] = $get->country;
-            }
-            
-            $json['status'] = 1;
-        }
-        
-        else{
-            $json = ['status'=>0];
-        }
-        
-        $this->output->set_content_type('application/json')->set_output(json_encode($json));
-    }
-    
-    
-    /*
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    ********************************************************************************************************************************
-    */
-    
-    
-    /**
-     * Get all projects created by a user
-     */
-    function get_user_projects(){
-        $this->genlib->ajaxOnly();
-        
-        $this->load->model('project');
-        $this->load->helper('text');
-        
-        $user_id = $this->input->get('user_id', TRUE);
-        
-        //set the sort order (itemName, quantity, unitPrice, totalPrice, transDate[default])
-        $order_by = $this->input->get('order_by') ? $this->input->get('order_by', TRUE) : "projects.date_created";
-        $order_format = $this->input->get('order_format') ? $this->input->get('order_format', TRUE) : "DESC";
-        
-        //count the total number of transactions customer was involved
-        $total_projects = count($this->project->get_user_projects($user_id, $order_by, $order_format, '', ''));
-        
-        $this->load->library('pagination');
-        
-        $page_number = $this->uri->segment(3, 0);//set page number to zero if the page number is not set in the third segment of uri
 	
-        $limit = $this->input->get('limit') ? $this->input->get('limit', TRUE) : 10;//show $limit per page
-        $start = $page_number == 0 ? 0 : ($page_number - 1) * $limit;//start from 0 if pageNumber is 0, else start from the next iteration
-        
-        //call setPaginationConfig($totalRows, $urlToCall, $limit, $attributes) in genlib to configure pagination
-        $config = $this->genlib->setPaginationConfig($total_projects, "users/get_user_projects", $limit, ['class'=>'lupnp']);
-        
-        $this->pagination->initialize($config);//initialize the library class
-        
-        //get projects
-        $user_projects = $this->project->get_user_projects($user_id, $order_by, $order_format, $start, $limit);
-        
-        if($user_projects){//if at least one result is returned
-            $data['user_projects'] = $user_projects;
-            $data['sn'] = $start+1;//table SN
-            
-            //load transactions table
-            $json['userProjectListTable'] = $this->load->view('users/user_project_list_table', $data, TRUE);
-            
-            //other info to return
-            $json['range'] = $total_projects > 0 ? ($start+1) . "-" . ($start + count($user_projects)) . " of " . $total_projects : "";//range being displayed
-            $json['links'] = $this->pagination->create_links();//page links
-            $json['userName'] = trim($this->genmod->gettablecol('users', 'CONCAT_WS(" ", first_name, last_name)', 'id', $user_id));
-            $json['status'] = 1;
-        }
-        
-        else{
-            $json = ['status'=>0];
-        }
-
-        $this->output->set_content_type('application/json')->set_output(json_encode($json));
-    }
-    
 	/*
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     ********************************************************************************************************************************
     
-	Function to pass data into the db, using prepared statement already created on the db and on faliure an sql statement
+	add deals to db, using prepared statement already created on the db and on faliure an sql statement
     */
-	function insertData($mysqli, $logo_info, $profile_info){
-		$_POST["portfolio"] = "";
-		
-	//	var_dump($logo_info['logo_url']);
-		if(empty($logo_info['logo_url'])){
-			$logo = "No image";
-		}else
-		{$logo = $logo_info['logo_url'];}
-		if(empty($profile_info['logo_url'])){
-			$profile = "No image";
-		}else
-		{$profile = $profile_info['logo_url'];}
+	function add_deals($mysqli, $user_id, $deals){
 
-		if (!$mysqli->query("CALL insertStylist('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')" ) ) {
+		if (!$mysqli->query("CALL add_deals('".$user_id."', '".$_POST["name"]."', '".$_POST["description"]."', '".$deals."')" ) ) { 
 			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			if(!$mysqli->query("INSERT INTO stylist(username, first_name, last_name, email, mobile_1, mobile_2, password, logo, street, city, state, country, about, weekday_hours, weekend_hours, work_days, picture, portfolio) VALUES ('".$_POST["username"]."', '".$_POST["first_name"]."', '".$_POST["last_name"]."', '".$_POST["email"]."', '".$_POST["mobile_1"]."', '".$_POST["mobile_2"]."', '".$_POST["password"]."', '".$logo."', '".$_POST["street"]."', '".$_POST["city"]."', '".$_POST["state"]."', '".$_POST["country"]."', '".$_POST["about"]."', '".$_POST["from_time"]."', '".$_POST["to_time"]."', '".$_POST["work_day"]."', '".$profile."', '".$_POST["portfolio"]."')") ){
-				echo "Data insertion failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			}
-			echo "Stylist created successfully";
-		}
+			$json['msg'] = $mysqli->errno ." : ". $mysqli->error;
+			$json['status'] = 0;
+		}else{
+			$json['msg'] = $mysqli->errno;
+			$json['status'] = 1;
+			echo "Stylist updated successfully";}
+		
+		return $json;	
 	}
-	
 	/*
     ********************************************************************************************************************************
     ********************************************************************************************************************************
@@ -503,10 +455,38 @@
 		}else{echo "Stylist updated successfully";}
 	}
 	
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    
+	Update stylist with portfolio info, using prepared statement already created on the db and on faliure an sql statement
+    */
 	function addImage($mysqli, $user_id, $portfolio){
-		$logo_info['msg'] = !$mysqli->query("CALL add_pimage('".$user_id."', '".$portfolio."')" ) ? $mysqli->errno ." : ". $mysqli->error : $json['status'] = 1;
+		
+	//	$logo_info['msg'] = !$mysqli->query("CALL add_pimage('".$user_id."', '".$portfolio."')" ) ? $mysqli->errno ." : ". $mysqli->error : $json['status'] = 1;
+		
+		if (!$mysqli->query("CALL add_pimage('".$user_id."', '".$portfolio."')" ) ) { 
+			echo "CALL failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			$json['msg'] = $mysqli->errno ." : ". $mysqli->error;
+			$json['status'] = 0;
+		}else{
+			$json['msg'] = $mysqli->errno;
+			$json['status'] = 1;
+			echo "Stylist updated successfully";}
+		
+		return $json;	
 	}
 	
+	/*
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    ********************************************************************************************************************************
+    
+	Update stylist with portfolio info, using prepared statement already created on the db and on faliure an sql statement
+    */
 	function fetchData($mysqli){
 		
 		if (!($stmt = $mysqli->prepare("CALL getStylist()"))) {

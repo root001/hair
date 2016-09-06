@@ -136,6 +136,7 @@
         var formInfo = new FormData();
 
 		formInfo.append("input_tag", tags);
+		formInfo.append("form", 'uploadForm');
 	//	alert(formInfo);	
 			
         //make ajax request if all is well
@@ -149,7 +150,37 @@
         });
     });
 	
+	$("#submitDeal").click(function(e){    
+        e.preventDefault();
+        
+		var logo = document.getElementById('dealImage').files;
+		var name = document.getElementById('name').value;
+		var description = document.getElementById('description').value;
 
+        //set info to send to server
+        var formInfo = new FormData();
+
+		for (var i = 0; i < logo.length; i++) {
+            var file = logo[i];
+
+            // Add the file to the request.
+            formInfo.append("logo", file);
+        }
+		formInfo.append("name", name);
+		formInfo.append("description", description);
+		formInfo.append("form", 'submitDeal');
+	//	alert(formInfo);	
+			
+        //make ajax request if all is well
+        $.ajax({
+            method: "POST",
+            url: "Stylist.php",
+            data: formInfo,
+            cache: false,
+            processData: false,
+            contentType: false
+        });
+    });
 	
 </script>
 
